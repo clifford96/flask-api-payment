@@ -3,75 +3,52 @@ from . import transactions_blueprint
 
 transactions = []
 
-@transactions_blueprint.route('/merchant/transactions/id', methods=['GET'])
-def get_transactions():
-    return jsonify(transactions)
-
-@transactions_blueprint.route('/merchant/transactions/id', methods=['POST'])
-def create_transaction():
-    data = request.get_json()
-    # Process the transaction data and save it
-    transaction = {
-        'amount': data['amount'],
-        'currency': data['currency'],
-        'description': data['description']
-    }
-    transactions.append(transaction)
-    # Return the response
-    return jsonify({
-        'message': 'Transaction created',
-        'transaction_id': len(transactions),
-        'amount': transaction['amount'],
-        'currency': transaction['currency'],
-        'description': transaction['description']
-    }), 201
-
-@transactions_blueprint.route('/merchant/transactions', methods=['POST'])
+@transactions_blueprint.route('/merchant/transactions', methods=['GET'])
 def query_transaction():
     data = request.get_json()
-    query = data['query']
-    
-    if query == 'I would like to request for the most recent transaction':
-        if len(transactions) > 0:
-            recent_transaction = transactions[-1]
-            return jsonify(recent_transaction)
+    custId = data.get('custId')
+    record = data.get('record')
+
+    if custId and custId.isdigit():
+        if record == 'latest':
+
+            return jsonify({
+                    'message': 'Transaction found',
+                    'mercTransId':'9999999',
+                    'bankTxnId':'9999999',
+                    'transDt': '2023/05/28',
+                    'mercOrderId':'6060606',
+                    'paymentAmt': 1000,
+                    'paymentCur': 'MYR'
+    }), 201
         else:
-            return jsonify({'message': 'No transactions found.'}), 404
-    
-    # Handle other types of queries if needed
-    
-    return jsonify({'message': 'Invalid query.'}), 400
 
-@transactions_blueprint.route('/bank/request', methods=['GET'])
-def bank_request():
-    data = request.get_json()
-    query = data['query']
+            return jsonify({'message': 'Invalid query.'}),400
 
-    if 'check' in query.lower() and ('transaction' in query.lower() or 'payment' in query.lower()):
-        return jsonify({
-            'message': 'Please provide IC for verification'
-        })
-    else:
-        return jsonify({
-            'message': 'Invalid query'
-        }), 400
 
-@transactions_blueprint.route('/bank/verification', methods=['POST'])
+@transactions_blueprint.route('/bank/transaction/verification', methods=['POST'])
 def verify_transaction():
     data = request.get_json()
-    verification_input = data['identity']
+    verification_input = data['ic']
     
     if len(verification_input) == 12 and verification_input.isdigit():
-        return jsonify({'message': 'Verification approved. Please provide the Transaction ID'}), 200
+        return jsonify({'message': 'Verification approved.',
+                        'hash' : '8u7fc503953909637f78hg8c99b3b85ddde362418985afc11901bdefe8349102' }), 200
     else:
         return jsonify({'message': 'Invalid verification code. Expected 12-digit number.'}), 400
 
 
-@transactions_blueprint.route('/bank/transactions', methods=['POST'])
+@transactions_blueprint.route('/bank/transactions/status', methods=['GET'])
 def check_transaction():
-    transaction_id = request.json.get('transaction_id')
+    data = request.get_json()
+    bankTxnId = data.get('bankTxnId')
+    hash = data.get('hash')
 
-    if transaction_id and transaction_id.isdigit():
-        return jsonify({'message': 'Transaction was successful'})
+    if bankTxnId and hash:
+
+        return jsonify({
+                    'status': 'Transaction successful'
+    }), 201
     else:
-        return jsonify({'message': 'Invalid transaction ID.'}), 404
+
+        return jsonify({'message': 'Invalid query.'}),400
