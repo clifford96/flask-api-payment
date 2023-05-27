@@ -5,9 +5,8 @@ transactions = []
 
 @transactions_blueprint.route('/merchant/transactions', methods=['GET'])
 def query_transaction():
-    data = request.get_json()
-    custId = data.get('custId')
-    record = data.get('record')
+    custId = request.args.get('custId')
+    record = request.args.get('record')
 
     if custId and custId.isdigit():
         if record == 'latest':
@@ -28,8 +27,7 @@ def query_transaction():
 
 @transactions_blueprint.route('/bank/transaction/verification', methods=['POST'])
 def verify_transaction():
-    data = request.get_json()
-    verification_input = data['ic']
+    verification_input = request.args.get['ic']
     
     if len(verification_input) == 12 and verification_input.isdigit():
         return jsonify({'message': 'Verification approved.',
@@ -39,10 +37,9 @@ def verify_transaction():
 
 
 @transactions_blueprint.route('/bank/transactions/status', methods=['GET'])
-def check_transaction():
-    data = request.get_json()
-    bankTxnId = data.get('bankTxnId')
-    hash = data.get('hash')
+def check_transaction():    
+    bankTxnId = request.args.get('bankTxnId')
+    hash = request.args.get('hash')
 
     if bankTxnId and hash:
 
