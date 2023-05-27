@@ -47,7 +47,7 @@ def bank_request():
     data = request.get_json()
     query = data['query']
 
-    if query == 'Please check if the transaction is successful':
+    if 'check' in query.lower() and ('transaction' in query.lower() or 'payment' in query.lower()):
         return jsonify({
             'message': 'Please provide IC for verification'
         })
@@ -59,20 +59,19 @@ def bank_request():
 @transactions_blueprint.route('/bank/verification', methods=['POST'])
 def verify_transaction():
     data = request.get_json()
-    verification_code = '121212-12-1212'
-    verification_input = data['query']
+    verification_input = data['identity']
     
-    if verification_input == verification_code:
+    if len(verification_input) == 12 and verification_input.isdigit():
         return jsonify({'message': 'Verification approved. Please provide the Transaction ID'}), 200
-    
-    return jsonify({'message': 'Invalid verification code.'}), 400
+    else:
+        return jsonify({'message': 'Invalid verification code. Expected 12-digit number.'}), 400
+
 
 @transactions_blueprint.route('/bank/transactions', methods=['POST'])
 def check_transaction():
-    transaction_id = request.json['transaction_id']
+    transaction_id = request.json.get('transaction_id')
 
-    if transaction_id == 1:
-        return jsonify({'message':'Transaction was Successful'})
+    if transaction_id and transaction_id.isdigit():
+        return jsonify({'message': 'Transaction was successful'})
     else:
         return jsonify({'message': 'Invalid transaction ID.'}), 404
-
