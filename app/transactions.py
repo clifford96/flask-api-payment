@@ -50,7 +50,7 @@ def check_transaction():
 
         return jsonify({'message': 'Invalid query.'}),400
     
-@transactions_blueprint.route('/bank/transaction/dispute', methods=['POST'])
+@transactions_blueprint.route('/merchant/transaction/dispute', methods=['POST'])
 def verify_transaction():
     request = request.json['request']
     
