@@ -50,8 +50,7 @@ def check_transaction():
 
         return jsonify({'message': 'Invalid query.'}),400
     
-@transactions_blueprint.route('/merchant/transaction/dispute', methods=['POST'])
-def verify_transaction():
-    request = request.json['request']
+@transactions_blueprint.route('/merchant/transaction/dispute', methods=['GET'])
+def dispute():
     
-    return jsonify({'message': 'We have received your request and is now processing it.'}), 200
+    return jsonify({'message': 'Your payment dispute for order #2456 is pending approval from the merchant'}), 200
